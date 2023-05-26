@@ -90,3 +90,57 @@ function handleGameOver() {
   updateScore();
   window.location.reload();
   clearInterval(interval);
+}
+
+function collisionDetection() {
+  for (var r = 0; r < numberOfRows; r++) {
+    for (var c = 0; c < numberOfColumns; c++) {
+      var b = bricks[r][c];
+      if (
+        y <= b.y + brickHeight &&
+        y >= b.y &&
+        x >= b.x &&
+        x <= b.x + brickWidth &&
+        b.status === 1
+      ) {
+        dy = -dy;
+        b.status = 0;
+        updateScore();
+      }
+    }
+  }
+}
+
+function draw() {
+  ctx.beginPath();
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+  ctx.fillStyle = "#0095D";
+  ctx.fill();
+  ctx.closePath();
+  checkBoundaryHit();
+  x += dx;
+  y += dy;
+  drawAllBricks();
+  drawPaddle();
+  collisionDetection();
+}
+
+function drawPaddle() {
+  ctx.beginPath();
+  ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+}
+
+generateAllBricks();
+drawAllBricks();
+const interval = setInterval(draw, 20);
+window.onkeydown = (e) => {
+  if (e.key == "Right" || e.key == "ArrowRight") {
+    if (paddleX + 10 + paddleWidth <= canvasWidth) paddleX = paddleX + 10;
+  } else if (e.key == "Left" || e.key == "ArrowLeft") {
+    if (paddleX - 10 >= 0) paddleX = paddleX - 10;
+  }
+};
